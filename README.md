@@ -1,13 +1,14 @@
 # NOSLIB
 
-*NOSLIB* is a 2D noise library written in C99 that aims for simple user interface and fast generation speeds.
-*NOSLIB* is written in C99 and uses no external dependencies except the standard C library
+*NOSLIB* is a 2D noise library written in C99 that aims for a simple user interface and fast generation speeds.
+*NOSLIB* uses an unusual method to generate noise. the information about this method is in
+sources tab.
 
 ## How to use *NOSLIB*
 
 ### Setting up the context
 
-*NOSLIB* is super simple to use. theres only a single initialization step and thats creating the context.
+*NOSLIB* is super simple to use. there's only a single initialization step and thats creating the context
 
 ```C
 NoiseContext ctx = {
@@ -20,15 +21,15 @@ NoiseContext ctx = {
 };
 ```
 
-this code states what the noise produced should look like.
-also you dont hav to write it out all the time its already defined in the header.
+this code states what the noise being produced should look like.
+also you don't have to write it out all the time it's already defined in the header.
 just use this.
 
 ```C
 NoiseContext ctx = NOSLIB_DEFAULT_CONTEXT;
 ```
 
-and its all the same values as example from before.
+and it's all the same values as the example from before.
 
 ### Generating noise
 
@@ -40,7 +41,7 @@ to generate noise.
 float value = nl_getNoiseAt(ctx, 10, 10);
 
 // generate the whole chunk
-// pass the context and coordinate of topleft corner of the chunk we want
+// pass the context and coordinate of the top-left corner of the chunk we want
 float* chunk = nl_getChunkAt(ctx, 0, 0);
 
 // make sure to free the values by either using custom function or just free()
@@ -49,9 +50,9 @@ nl_freeChunk(chunk); // or just free(chunk)
 
 ## Extra settings
 
-To make noise generation extra smooth *NOSLIB* offers few algorithms.
+To make noise generation extra smooth *NOSLIB* offers a few algorithms.
 To use them you have to modify your context, specifically the interVersion variable.
-Choises are:
+Choices are:
 
 ```C
 SMOOTH_STEP, // this is the default
@@ -59,3 +60,11 @@ SMOOTHER_STEP,
 COSINE_INTERPOLATION,
 BILINEAR_INTERPOLATION
 ```
+
+## Sources
+
+The main inspiration comes from this youtube video by PortalRunner:
+[Watch the video](https://www.youtube.com/watch?v=p-k5MPhBSjk)
+skip to about 5:00.
+
+The inspiration is taken from that video but since PortalRunner was dealing with much more limited hardware so i added different interpolation functions, more advanced random function and such.
