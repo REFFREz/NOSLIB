@@ -27,6 +27,15 @@ typedef struct {
     NoiseInterpolationVersions interVersion; // defaulted to SMOOTH_STEP
 } NoiseContext;
 
+#define NOSLIB_DEFAULT_CONTEXT ((NoiseContext) { \
+    .seed = 1337, \
+    .chunkSize = 10, \
+    .octaves = 1, \
+    .freq = 1.0f, \
+    .rangeMax = 100.0f, \
+    .rangeMin = 0.0f \
+})
+
 float nl_getNoiseAt(NoiseContext ctx, size_t x, size_t y);
 
 // chunkX and Y should be the topleft corners of a chunk
