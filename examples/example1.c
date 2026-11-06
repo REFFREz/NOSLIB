@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "noslib_impl.h"
+#include "noslib.h"
 
 static char hValues[5] = {' ', '.', '+', '#', '@'};
 
@@ -39,6 +39,6 @@ int main(int argc, char** argv) {
         printf("\n");
     }
 
-    nl_freeChunk(chunkData);
+    nl_free(chunkData);
     return 0;
 }

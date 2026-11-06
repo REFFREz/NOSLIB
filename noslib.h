@@ -7,11 +7,14 @@
 typedef uint64_t u64;
 typedef int64_t i64;
 
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+
 typedef enum {
     SMOOTH_STEP,
     SMOOTHER_STEP,
     COSINE_INTERPOLATION,
-    BILINEAR_INTERPOLATION
+    LINEAR_INTERPOLATION
 } NoiseInterpolationVersions;
 
 typedef struct {
@@ -40,6 +43,19 @@ float nl_getNoiseAt(NoiseContext ctx, size_t x, size_t y);
 
 // chunkX and Y should be the topleft corners of a chunk
 float* nl_getChunkAt(NoiseContext ctx, size_t chunkX, size_t chunkY); 
-void nl_freeChunk(float* chunk);
+// uses for loops to iterate through the whole batch, may cost some performance.
+float* nl_getBatch(NoiseContext ctx, size_t x1, size_t y1, size_t x2, size_t y2);
+void nl_getBatchInto(NoiseContext ctx, size_t x1, size_t y1, size_t x2, size_t y2, float* dest);
+
+// ************ //
+// 1D functions //
+// ************ //
+
+float nl_getNoiseAt1D(NoiseContext ctx, float x);
+float* nl_getSectionAt1D(NoiseContext ctx, float x1, float x2);
+float* nl_getChunkAt1D(NoiseContext ctx, float x);
+
+float nl_clamp(float value, float min, float max);
+void nl_free(float* chunk);
 
 #endif

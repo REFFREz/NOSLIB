@@ -33,8 +33,8 @@ and it's all the same values as the example from before.
 
 ### Generating noise
 
-Generating noise using *NOSLIB* is as simple as it gets. there are just 2 functions
-to generate noise.
+Generating noise using *NOSLIB* is as simple as it gets.
+to generate noise use this example.
 
 ```C
 // pass the context and x and y coordinates
@@ -45,7 +45,7 @@ float value = nl_getNoiseAt(ctx, 10, 10);
 float* chunk = nl_getChunkAt(ctx, 0, 0);
 
 // make sure to free the values by either using custom function or just free()
-nl_freeChunk(chunk); // or just free(chunk)
+nl_free(chunk); // or just free(chunk)
 ```
 
 ## Extra settings
@@ -58,7 +58,20 @@ Choices are:
 SMOOTH_STEP, // this is the default
 SMOOTHER_STEP,
 COSINE_INTERPOLATION,
-BILINEAR_INTERPOLATION
+LINEAR_INTERPOLATION
+```
+
+## 1D noise
+
+*NOSLIB* offers a way to generate 1D noise directly without needing to use normal 2D functions.
+this is a really nice feature if you worry about performance since this step massivly speeds it up.
+
+heres the functions:
+
+```C
+float nl_getNoiseAt1D(NoiseContext ctx, float x);
+float* nl_getSectionAt1D(NoiseContext ctx, float x1, float x2);
+float* nl_getChunkAt1D(NoiseContext ctx, float x);
 ```
 
 ## Sources
