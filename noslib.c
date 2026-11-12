@@ -11,6 +11,8 @@
 u64 fallbackValue = 1337;
 
 uint64_t lhash(u64 x) {
+    if (x == 0) x = UINT64_C(0x94d049bb133111eb);
+
     x ^= x >> 30;
     x *= UINT64_C(0xbf58476d1ce4e5b9);
     x ^= x >> 27;
@@ -34,6 +36,7 @@ u64 hash2(u64 a, u64 b) {
 
 float frand(u64 seed, float min, float max) {
     uint64_t x = seed;
+    if (x == 0) x = 0x9404bf1331b;
 
     x ^= x >> 30;
     x *= UINT64_C(0xbf58476d1ce4e5b9);
@@ -65,8 +68,8 @@ float cosineInterpolation(float t) {
 
 // this is the old version that uses int coordinates instead of floats
 // it is a little bit faster too.
-float getNoiseAtOld(NoiseContext ctx, size_t x, size_t y) {
-    u64 csize = ctx.chunkSize;
+float getNoiseAtOld(NoiseContext* ctx, size_t x, size_t y) {
+    u64 csize = ctx->chunkSize;
     
     // getting the coordinate of topleft corner of the chunk we are in
     u64 boundX = x - (x % csize);
@@ -77,10 +80,10 @@ float getNoiseAtOld(NoiseContext ctx, size_t x, size_t y) {
     //    1 - 2
     //    3 - 4
 
-    float chunkValue1 = frand(hash3(ctx.seed, boundX, boundY), ctx.rangeMin, ctx.rangeMax);
-    float chunkValue2 = frand(hash3(ctx.seed, boundX + csize, boundY), ctx.rangeMin, ctx.rangeMax);
-    float chunkValue3 = frand(hash3(ctx.seed, boundX, boundY + csize), ctx.rangeMin, ctx.rangeMax);
-    float chunkValue4 = frand(hash3(ctx.seed, boundX + csize, boundY + csize), ctx.rangeMin, ctx.rangeMax);
+    float chunkValue1 = frand(hash3(ctx->seed, boundX, boundY), ctx->rangeMin, ctx->rangeMax);
+    float chunkValue2 = frand(hash3(ctx->seed, boundX + csize, boundY), ctx->rangeMin, ctx->rangeMax);
+    float chunkValue3 = frand(hash3(ctx->seed, boundX, boundY + csize), ctx->rangeMin, ctx->rangeMax);
+    float chunkValue4 = frand(hash3(ctx->seed, boundX + csize, boundY + csize), ctx->rangeMin, ctx->rangeMax);
 
     // using 2D lerp to get the final value
     float tx = (float)(x - boundX) / (float)csize;
@@ -94,8 +97,8 @@ float getNoiseAtOld(NoiseContext ctx, size_t x, size_t y) {
     return f;
 }
 
-float getNoiseAt(NoiseContext ctx, float x, float y) {
-    float csize = (float)ctx.chunkSize;
+float getNoiseAt(NoiseContext* ctx, float x, float y) {
+    float csize = (float)ctx->chunkSize;
 
     // Find surrounding lattice corners
     float boundX = floorf(x / csize) * csize;
@@ -104,14 +107,14 @@ float getNoiseAt(NoiseContext ctx, float x, float y) {
     u64 bx = (u64)boundX;
     u64 by = (u64)boundY;
 
-    float v1 = frand(hash3(ctx.seed, bx, by), ctx.rangeMin, ctx.rangeMax);
-    float v2 = frand(hash3(ctx.seed, bx + ctx.chunkSize, by), ctx.rangeMin, ctx.rangeMax);
-    float v3 = frand(hash3(ctx.seed, bx, by + ctx.chunkSize), ctx.rangeMin, ctx.rangeMax);
-    float v4 = frand(hash3(ctx.seed, bx + ctx.chunkSize, by + ctx.chunkSize), ctx.rangeMin, ctx.rangeMax);
+    float v1 = frand(hash3(ctx->seed, bx, by), ctx->rangeMin, ctx->rangeMax);
+    float v2 = frand(hash3(ctx->seed, bx + ctx->chunkSize, by), ctx->rangeMin, ctx->rangeMax);
+    float v3 = frand(hash3(ctx->seed, bx, by + ctx->chunkSize), ctx->rangeMin, ctx->rangeMax);
+    float v4 = frand(hash3(ctx->seed, bx + ctx->chunkSize, by + ctx->chunkSize), ctx->rangeMin, ctx->rangeMax);
 
     float tx, ty, top, bottom;
 
-    switch (ctx.interVersion) {
+    switch (ctx->interVersion) {
         case SMOOTH_STEP: {
             tx = smoothstep((x - boundX) / csize);
             ty = smoothstep((y - boundY) / csize);
@@ -156,21 +159,21 @@ float getNoiseAt(NoiseContext ctx, float x, float y) {
 
 // implementation of public functions
 
-float nl_getNoiseAt(NoiseContext ctx, size_t x, size_t y) {
-    if (ctx.octaves < 1) {return getNoiseAt(ctx, x, y);}
+float nl_getNoiseAt(NoiseContext* ctx, size_t x, size_t y) {
+    if (ctx->octaves < 1) {return getNoiseAt(ctx, x, y);}
 
     float amplitude = 1.0f;
-    float frequency = ctx.freq;
+    float frequency = ctx->freq;
 
     float total = 0.0f;
     float maxAmplitude = 0.0f;
 
-    for (size_t i = 0; i < ctx.octaves; i++) {
-        NoiseContext octave = ctx;
+    for (size_t i = 0; i < ctx->octaves; i++) {
+        NoiseContext octave = *ctx;
 
-        octave.seed = lhash(ctx.seed + i);
+        octave.seed = lhash(ctx->seed + i);
 
-        total += getNoiseAt(octave, (float)x * frequency, (float)y * frequency) * amplitude;
+        total += getNoiseAt(&octave, (float)x * frequency, (float)y * frequency) * amplitude;
 
         maxAmplitude += amplitude;
 
@@ -188,8 +191,8 @@ float nl_clamp(float value, float min, float max) {
 }
 
 // chunkX and Y should be the topleft corners of a chunk
-float* nl_getChunkAt(NoiseContext ctx, size_t chunkX, size_t chunkY) {
-    u64 csize = ctx.chunkSize;
+float* nl_getChunkAt(NoiseContext* ctx, size_t chunkX, size_t chunkY) {
+    u64 csize = ctx->chunkSize;
     
     float* out = malloc(csize * csize * sizeof(float));
     if (out == NULL) return NULL;
@@ -203,7 +206,7 @@ float* nl_getChunkAt(NoiseContext ctx, size_t chunkX, size_t chunkY) {
     return out;
 }
 
-float* nl_getBatch(NoiseContext ctx, size_t x1, size_t y1, size_t x2, size_t y2) {
+float* nl_getBatch(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2) {
     size_t minX = MIN(x1, x2);
     size_t minY = MIN(y1, y2);
     size_t maxX = MAX(x1, x2);
@@ -226,7 +229,7 @@ float* nl_getBatch(NoiseContext ctx, size_t x1, size_t y1, size_t x2, size_t y2)
     return out;
 }
 
-void nl_getBatchInto(NoiseContext ctx, size_t x1, size_t y1, size_t x2, size_t y2, float* dest) {
+void nl_getBatchInto(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2, float* dest) {
     size_t minX = MIN(x1, x2);
     size_t minY = MIN(y1, y2);
     size_t maxX = MAX(x1, x2);
@@ -253,18 +256,18 @@ void nl_free(float* chunk) {
 // ************ //
 
 // stripped and faster version of the algorithm behind this library
-float getNoiseAt1D(NoiseContext ctx, float x) {
-    size_t sz = ctx.chunkSize;
+float getNoiseAt1D(NoiseContext* ctx, float x) {
+    size_t sz = ctx->chunkSize;
 
     float sectionStart = floorf(x / sz) * sz;
     float sectionEnd = sectionStart + sz;
 
-    float v1 = frand(hash2(ctx.seed, sectionStart), ctx.rangeMin, ctx.rangeMax);
-    float v2 = frand(hash2(ctx.seed, sectionEnd), ctx.rangeMin, ctx.rangeMax);
+    float v1 = frand(hash2(ctx->seed, sectionStart), ctx->rangeMin, ctx->rangeMax);
+    float v2 = frand(hash2(ctx->seed, sectionEnd), ctx->rangeMin, ctx->rangeMax);
 
     float t = (x - sectionStart) / sz;
 
-    switch (ctx.interVersion) {
+    switch (ctx->interVersion) {
         case SMOOTH_STEP:
             t = smoothstep(t);
             break;
@@ -284,21 +287,21 @@ float getNoiseAt1D(NoiseContext ctx, float x) {
     return lerp(v1, v2, t);
 }
 
-float nl_getNoiseAt1D(NoiseContext ctx, float x) {
-    if (ctx.octaves < 1) {return getNoiseAt1D(ctx, x);}
+float nl_getNoiseAt1D(NoiseContext* ctx, float x) {
+    if (ctx->octaves < 1) {return getNoiseAt1D(ctx, x);}
 
     float amplitude = 1.0f;
-    float frequency = ctx.freq;
+    float frequency = ctx->freq;
 
     float total = 0.0f;
     float maxAmplitude = 0.0f;
 
-    for (size_t i = 0; i < ctx.octaves; i++) {
-        NoiseContext octave = ctx;
+    for (size_t i = 0; i < ctx->octaves; i++) {
+        NoiseContext octave = *ctx;
 
-        octave.seed = lhash(ctx.seed + i);
+        octave.seed = lhash(ctx->seed + i);
 
-        total += getNoiseAt1D(octave, x * frequency) * amplitude;
+        total += getNoiseAt1D(&octave, x * frequency) * amplitude;
 
         maxAmplitude += amplitude;
 
@@ -309,7 +312,7 @@ float nl_getNoiseAt1D(NoiseContext ctx, float x) {
     return total / maxAmplitude;
 }
 
-float* nl_getSectionAt1D(NoiseContext ctx, float x1, float x2) {
+float* nl_getSectionAt1D(NoiseContext* ctx, float x1, float x2) {
     size_t minX = (size_t)MIN(x1, x2);
     size_t maxX = (size_t)MAX(x1, x2);
 
@@ -325,8 +328,8 @@ float* nl_getSectionAt1D(NoiseContext ctx, float x1, float x2) {
     return out;
 }
 
-float* nl_getChunkAt1D(NoiseContext ctx, float x) {
-    size_t sz = ctx.chunkSize;
+float* nl_getChunkAt1D(NoiseContext* ctx, float x) {
+    size_t sz = ctx->chunkSize;
 
     if (sz == 0 || x < 0.0f) return NULL;
 
