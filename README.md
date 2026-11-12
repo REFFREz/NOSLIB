@@ -38,11 +38,11 @@ to generate noise use this example.
 
 ```C
 // pass the context and x and y coordinates
-float value = nl_getNoiseAt(ctx, 10, 10);
+float value = nl_getNoiseAt(&ctx, 10, 10);
 
 // generate the whole chunk
 // pass the context and coordinate of the top-left corner of the chunk we want
-float* chunk = nl_getChunkAt(ctx, 0, 0);
+float* chunk = nl_getChunkAt(&ctx, 0, 0);
 
 // make sure to free the values by either using custom function or just free()
 nl_free(chunk); // or just free(chunk)
@@ -69,9 +69,9 @@ this is a really nice feature if you worry about performance since this step mas
 heres the functions:
 
 ```C
-float nl_getNoiseAt1D(NoiseContext ctx, float x);
-float* nl_getSectionAt1D(NoiseContext ctx, float x1, float x2);
-float* nl_getChunkAt1D(NoiseContext ctx, float x);
+float nl_getNoiseAt1D(NoiseContext* ctx, float x);
+float* nl_getSectionAt1D(NoiseContext* ctx, float x1, float x2);
+float* nl_getChunkAt1D(NoiseContext* ctx, float x);
 ```
 
 ## Sources
