@@ -69,8 +69,9 @@ float cosineInterpolation(float t) {
 // this is the old version that uses int coordinates instead of floats
 // it is a little bit faster too.
 float getNoiseAtOld(NoiseContext* ctx, size_t x, size_t y) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     u64 csize = ctx->chunkSize;
-    
+
     // getting the coordinate of topleft corner of the chunk we are in
     u64 boundX = x - (x % csize);
     u64 boundY = y - (y % csize);
@@ -98,6 +99,7 @@ float getNoiseAtOld(NoiseContext* ctx, size_t x, size_t y) {
 }
 
 float getNoiseAt(NoiseContext* ctx, float x, float y) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     float csize = (float)ctx->chunkSize;
 
     // Find surrounding lattice corners
@@ -160,6 +162,7 @@ float getNoiseAt(NoiseContext* ctx, float x, float y) {
 // implementation of public functions
 
 float nl_getNoiseAt(NoiseContext* ctx, size_t x, size_t y) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     if (ctx->octaves < 1) {return getNoiseAt(ctx, x, y);}
 
     float amplitude = 1.0f;
@@ -192,6 +195,7 @@ float nl_clamp(float value, float min, float max) {
 
 // chunkX and Y should be the topleft corners of a chunk
 float* nl_getChunkAt(NoiseContext* ctx, size_t chunkX, size_t chunkY) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     u64 csize = ctx->chunkSize;
     
     float* out = malloc(csize * csize * sizeof(float));
@@ -257,6 +261,7 @@ void nl_free(float* chunk) {
 
 // stripped and faster version of the algorithm behind this library
 float getNoiseAt1D(NoiseContext* ctx, float x) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     size_t sz = ctx->chunkSize;
 
     float sectionStart = floorf(x / sz) * sz;
@@ -288,6 +293,7 @@ float getNoiseAt1D(NoiseContext* ctx, float x) {
 }
 
 float nl_getNoiseAt1D(NoiseContext* ctx, float x) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     if (ctx->octaves < 1) {return getNoiseAt1D(ctx, x);}
 
     float amplitude = 1.0f;
@@ -329,6 +335,7 @@ float* nl_getSectionAt1D(NoiseContext* ctx, float x1, float x2) {
 }
 
 float* nl_getChunkAt1D(NoiseContext* ctx, float x) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     size_t sz = ctx->chunkSize;
 
     if (sz == 0 || x < 0.0f) return NULL;
