@@ -210,6 +210,20 @@ float* nl_getChunkAt(NoiseContext* ctx, size_t chunkX, size_t chunkY) {
     return out;
 }
 
+// chunkX and Y should be the topleft corners of a chunk
+void nl_getChunkInto(NoiseContext* ctx, size_t chunkX, size_t chunkY, float* dest) {
+    if (dest == NULL) return 0;
+
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
+    u64 csize = ctx->chunkSize;
+
+    for (size_t y = 0; y < csize; y++) {
+        for (size_t x = 0; x < csize; x++) {
+            dest[y * csize + x] = nl_getNoiseAt(ctx, x + chunkX, y + chunkY);
+        }
+    }
+}
+
 float* nl_getBatch(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2) {
     size_t minX = MIN(x1, x2);
     size_t minY = MIN(y1, y2);
@@ -334,6 +348,17 @@ float* nl_getSectionAt1D(NoiseContext* ctx, float x1, float x2) {
     return out;
 }
 
+void nl_getSectionInto1D(NoiseContext* ctx, float x1, float x2, float* dest) {
+    size_t minX = (size_t)MIN(x1, x2);
+    size_t maxX = (size_t)MAX(x1, x2);
+
+    if (maxX - minX == 0) return;
+
+    for (size_t i = minX; i < maxX; i++) {
+        dest[i - minX] = nl_getNoiseAt1D(ctx, (float)i);
+    }
+}
+
 float* nl_getChunkAt1D(NoiseContext* ctx, float x) {
     if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     size_t sz = ctx->chunkSize;
@@ -351,4 +376,41 @@ float* nl_getChunkAt1D(NoiseContext* ctx, float x) {
     }
 
     return out;
+}
+
+void nl_getChunkInto1D(NoiseContext* ctx, float x, float* dest) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
+    size_t sz = ctx->chunkSize;
+
+    if (sz == 0 || x < 0.0f) return;
+
+    size_t sectionStart = ((size_t)x / sz) * sz;
+    size_t sectionEnd = sectionStart + sz;
+
+    for (size_t i = sectionStart; i < sectionEnd; i++) {
+        dest[i - sectionStart] = nl_getNoiseAt1D(ctx, (float)i);
+    }
+}
+
+size_t nl_getChunkSizeB(NoiseContext* ctx) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
+    return (sizeof(float) * ctx->chunkSize * ctx->chunkSize);
+}
+
+size_t nl_getChunkSizeB1D(NoiseContext* ctx) {
+    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
+    return (sizeof(float) * ctx->chunkSize);
+}
+
+size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2) {
+    size_t lx = MAX(x1, x2) - MIN(x1, x2);
+    size_t ly = MAX(y1, y2) - MIN(y1, y2);
+
+    if (lx == 0 || ly == 0) return 0;
+
+    return (sizeof(float) * lx * ly);
+}
+
+size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2) {
+    return (sizeof(float) * MAX(x1, x2) - MIN(x1, x2));
 }
