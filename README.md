@@ -71,7 +71,18 @@ heres the functions:
 ```C
 float nl_getNoiseAt1D(NoiseContext* ctx, float x);
 float* nl_getSectionAt1D(NoiseContext* ctx, float x1, float x2);
+void nl_getSectionInto1D(NoiseContext* ctx, float x1, float x2, float* dest);
 float* nl_getChunkAt1D(NoiseContext* ctx, float x);
+void nl_getChunkInto1D(NoiseContext* ctx, float x, float* dest);
+```
+
+also here are functions to get sizes that you want to allocate if you want to use "into" functions.
+
+```C
+size_t nl_getChunkSizeB(NoiseContext* ctx);
+size_t nl_getChunkSizeB1D(NoiseContext* ctx); // sorry for the name DDD
+size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2);
+size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2);
 ```
 
 ## Sources
