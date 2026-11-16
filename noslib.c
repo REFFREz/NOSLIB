@@ -9,6 +9,7 @@
 // local functions needed for noise generation
 
 u64 fallbackValue = 1337;
+u64 randState = 1337;
 
 uint64_t lhash(u64 x) {
     if (x == 0) x = UINT64_C(0x94d049bb133111eb);
@@ -48,6 +49,36 @@ float frand(u64 seed, float min, float max) {
     float t = (float)(x >> 40) / 16777216.0f;
 
     return min + t * (max - min);
+}
+
+u64 urand(u64 seed, u64 min, u64 max) {
+    u64 x = seed;
+    if (x == 0) x = 0x9404bf1331b;
+
+    x ^= x >> 30;
+    x *= UINT64_C(0xbf58476d1ce4e5b9);
+    x ^= x >> 27;
+    x *= UINT64_C(0x94d049bb133111eb);
+    x ^= x >> 31;
+
+    return min + x % (max - min);
+}
+
+void nl_randomSetSeed(u64 seed) {
+    randState = seed;
+}
+
+u64 nl_random() {
+    randState = urand(randState, 0, UINT64_MAX);
+    return randState;
+}
+
+u64 nl_rand(u64 seed, u64 min, u64 max) {
+    return urand(seed, min, max);
+}
+
+u64 nl_hash(u64 input) {
+    return lhash(input);
 }
 
 float lerp(float a, float b, float t) {

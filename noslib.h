@@ -70,6 +70,12 @@ float nl_clamp(float value, float min, float max);
 
 void nl_free(float* chunk);
 
+// private functions exposed
+void nl_randomSetSeed(u64 seed);
+u64 nl_random();
+u64 nl_rand(u64 seed, u64 min, u64 max);
+u64 nl_hash(u64 input);
+
 // NOTE //
 // into functions use for loops to iterate through the whole batch, may cost some performance.
 // also into functions expect destenations to be exact size or bigger than expected. if else
