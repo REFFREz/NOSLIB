@@ -1,7 +1,7 @@
 # NOSLIB
 
 *NOSLIB* is a 2D noise library written in C99 that aims for a simple user interface and fast generation speeds.
-*NOSLIB* uses an unusual method to generate noise. the information about this method is in
+*NOSLIB* is loyal to an unusual method to generate noise. the information about this method is in
 sources tab.
 
 ## How to use *NOSLIB*
@@ -83,6 +83,21 @@ size_t nl_getChunkSizeB(NoiseContext* ctx);
 size_t nl_getChunkSizeB1D(NoiseContext* ctx); // sorry for the name DDD
 size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2);
 size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2);
+```
+
+## Extra functions
+
+*NOSLIB* offers many extra functions to manipulate data.
+
+```C
+float nl_clamp(float value, float min, float max);
+float nl_lerp(float a, float b, float t);
+float nl_scale(float value, float scale);
+void  nl_scaleArr(float* data, size_t len, float scale);
+float nl_remap(float value, float in_min, float in_max, float out_min, float out_max);
+void  nl_remapArr(float* data, size_t len, float in_min, float in_max, float out_min, float out_max);
+float nl_fract(float value);
+float nl_move(float value, float goal);
 ```
 
 ## Sources

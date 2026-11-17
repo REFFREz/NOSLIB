@@ -218,12 +218,6 @@ float nl_getNoiseAt(NoiseContext* ctx, size_t x, size_t y) {
     return total / maxAmplitude;
 }
 
-float nl_clamp(float value, float min, float max) {
-    if (value < min) return min;
-    if (value > max) return max;
-    return value;
-}
-
 // chunkX and Y should be the topleft corners of a chunk
 float* nl_getChunkAt(NoiseContext* ctx, size_t chunkX, size_t chunkY) {
     if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
@@ -444,4 +438,52 @@ size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size
 
 size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2) {
     return (sizeof(float) * MAX(x1, x2) - MIN(x1, x2));
+}
+
+float nl_clamp(float value, float min, float max) {
+    if (value < min) return min;
+    if (value > max) return max;
+    return value;
+}
+
+float nl_lerp(float a, float b, float t) {
+    return lerp(a, b, t);
+}
+
+float nl_scale(float value, float scale) {
+    return value * scale;
+}
+
+void nl_scaleArr(float* data, size_t len, float scale) {
+    if (data == NULL) return;
+    if (len == 0) return;
+
+    for (size_t i = 0; i < len; i++) {
+        data[i] = nl_scale(data[i], scale);
+    }
+}
+
+float nl_remap(float value, float in_min, float in_max, float out_min, float out_max) {
+    return out_min + ((value - in_min) / (in_max - in_min)) * (out_max - out_min);
+}
+
+void nl_remapArr(float* data, size_t len, float in_min, float in_max, float out_min, float out_max) {
+    if (data == NULL) return;
+    if (len == 0) return;
+
+    for (size_t i = 0; i < len; i++) {
+        data[i] = nl_remap(data[i], in_min, in_max, out_min, out_max);
+    }
+}
+
+float nl_fract(float value) {
+    return value - floorf(value);
+}
+
+float nl_move(float value, float goal) {
+    if (value == goal) return NOSLIB_MOVE_RETURN;
+    if (value < goal) return 2;
+    if (value > goal) return -2;
+
+    return 0;
 }

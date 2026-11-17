@@ -14,6 +14,10 @@ typedef int64_t i64;
     #define NOSLIB_DEFAULT_CHUNK_SIZE 50
 #endif
 
+#ifndef NOSLIB_MOVE_RETURN
+    #define NOSLIB_MOVE_RETURN 1
+#endif
+
 #define NOSLIB_DEFAULT_CONTEXT ((NoiseContext) { \
     .seed = 1337, \
     .chunkSize = 10, \
@@ -67,6 +71,18 @@ size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size
 size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2);
 
 float nl_clamp(float value, float min, float max);
+float nl_lerp(float a, float b, float t);
+float nl_scale(float value, float scale);
+void  nl_scaleArr(float* data, size_t len, float scale);
+float nl_remap(float value, float in_min, float in_max, float out_min, float out_max);
+void  nl_remapArr(float* data, size_t len, float in_min, float in_max, float out_min, float out_max);
+float nl_fract(float value);
+
+// returns a value either 2 if value is less than goal, returns -2 if value is bigger than goal
+// and returns 1 if they are equal. also return 1 can be changed to any value with defenition of
+// #define NOSLIB_MOVE_RETURN <any value>
+// make sure to do this before including the library
+float nl_move(float value, float goal);
 
 void nl_free(float* chunk);
 

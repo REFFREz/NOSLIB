@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
         .seed = time(NULL)
     };
 
-    float* chunkData = nl_getChunkAt(ctx, 0, 0);
+    float* chunkData = nl_getChunkAt(&ctx, 0, 0);
 
     for (size_t y = 0; y < chunkSize; y++) {
         for (size_t x = 0; x < chunkSize; x++) {
