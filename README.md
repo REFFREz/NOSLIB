@@ -81,8 +81,8 @@ also here are functions to get sizes that you want to allocate if you want to us
 ```C
 size_t nl_getChunkSizeB(NoiseContext* ctx);
 size_t nl_getChunkSizeB1D(NoiseContext* ctx); // sorry for the name DDD
-size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2);
-size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2);
+size_t nl_getBatchSizeB(size_t x1, size_t y1, size_t x2, size_t y2);
+size_t nl_getSectionSizeB(float x1, float x2);
 ```
 
 ## Extra functions

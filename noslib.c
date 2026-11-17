@@ -395,7 +395,7 @@ size_t nl_getChunkSizeB1D(NoiseContext* ctx) {
     return (sizeof(float) * ctx->chunkSize);
 }
 
-size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2) {
+size_t nl_getBatchSizeB(size_t x1, size_t y1, size_t x2, size_t y2) {
     size_t lx = MAX(x1, x2) - MIN(x1, x2);
     size_t ly = MAX(y1, y2) - MIN(y1, y2);
 
@@ -404,7 +404,7 @@ size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size
     return (sizeof(float) * lx * ly);
 }
 
-size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2) {
+size_t nl_getSectionSizeB(float x1, float x2) {
     return (sizeof(float) * MAX(x1, x2) - MIN(x1, x2));
 }
 

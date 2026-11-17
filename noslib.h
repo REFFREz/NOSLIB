@@ -67,8 +67,8 @@ void nl_getChunkInto1D(NoiseContext* ctx, float x, float* dest);
 
 size_t nl_getChunkSizeB(NoiseContext* ctx);
 size_t nl_getChunkSizeB1D(NoiseContext* ctx); // sorry for the name DDD
-size_t nl_getBatchSizeB(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2);
-size_t nl_getSectionSizeB(NoiseContext* ctx, float x1, float x2);
+size_t nl_getBatchSizeB(size_t x1, size_t y1, size_t x2, size_t y2);
+size_t nl_getSectionSizeB(float x1, float x2);
 
 float nl_clamp(float value, float min, float max);
 float nl_lerp(float a, float b, float t);
