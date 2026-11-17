@@ -107,3 +107,27 @@ The main inspiration comes from this youtube video by PortalRunner:
 skip to about 5:00.
 
 The inspiration is taken from that video but since PortalRunner was dealing with much more limited hardware so i added different interpolation functions, more advanced random function and such.
+
+## Performance note
+
+even tho *NOSLIB* aims for very high speeds at low cost it can still be very slow if used incorrectly.
+it is recommended to use at least -O2 flag to give it a huge performance boost.
+here is some measurements on Ryzen 9 5900X cpu testing a 10000x10000 world creation with this settings:
+
+```C
+.chunkSize = 100
+.freq = 1
+.interVersion = SMOOTH_STEP
+.octaves = 0
+.rangeMax = 100
+.rangeMin = 0
+.seed = 0
+```
+
+```NO_LANGUAGE
+optimization - sps(samples per second) - time to generate
+-O0 -> 8.04 million sps  -> 12.4s
+-O1 -> 22.58 million sps -> 4.4s
+-O2 -> 29.65 million sps -> 3.37s
+-O3 -> 30.27 million sps -> 3.30s
+```

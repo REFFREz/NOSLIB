@@ -1,7 +1,4 @@
 .vscode/
-main.c
-main2.c
-main.exe
 Makefile
 examples/noslib.h
-performance/
+testing/
