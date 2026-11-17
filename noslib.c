@@ -97,38 +97,6 @@ float cosineInterpolation(float t) {
     return (1.0f - cosf(t * PI)) * 0.5f;
 }
 
-// this is the old version that uses int coordinates instead of floats
-// it is a little bit faster too.
-float getNoiseAtOld(NoiseContext* ctx, size_t x, size_t y) {
-    if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
-    u64 csize = ctx->chunkSize;
-
-    // getting the coordinate of topleft corner of the chunk we are in
-    u64 boundX = x - (x % csize);
-    u64 boundY = y - (y % csize);
-
-    // getting the noise values at 4 chunk corners
-    // order goes:
-    //    1 - 2
-    //    3 - 4
-
-    float chunkValue1 = frand(hash3(ctx->seed, boundX, boundY), ctx->rangeMin, ctx->rangeMax);
-    float chunkValue2 = frand(hash3(ctx->seed, boundX + csize, boundY), ctx->rangeMin, ctx->rangeMax);
-    float chunkValue3 = frand(hash3(ctx->seed, boundX, boundY + csize), ctx->rangeMin, ctx->rangeMax);
-    float chunkValue4 = frand(hash3(ctx->seed, boundX + csize, boundY + csize), ctx->rangeMin, ctx->rangeMax);
-
-    // using 2D lerp to get the final value
-    float tx = (float)(x - boundX) / (float)csize;
-    float ty = (float)(y - boundY) / (float)csize;
-
-    float top = lerp(chunkValue1, chunkValue2, tx);
-    float bottom = lerp(chunkValue3, chunkValue4, tx);
-
-    float f = lerp(top, bottom, ty);
-
-    return f;
-}
-
 float getNoiseAt(NoiseContext* ctx, float x, float y) {
     if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     float csize = (float)ctx->chunkSize;
