@@ -243,7 +243,7 @@ float* nl_getChunkAt(NoiseContext* ctx, size_t chunkX, size_t chunkY) {
 
 // chunkX and Y should be the topleft corners of a chunk
 void nl_getChunkInto(NoiseContext* ctx, size_t chunkX, size_t chunkY, float* dest) {
-    if (dest == NULL) return 0;
+    if (dest == NULL) return;
 
     if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
     u64 csize = ctx->chunkSize;
