@@ -131,3 +131,15 @@ optimization - sps(samples per second) - time to generate
 -O2 -> 69.71 million sps -> 1.43s
 -O3 -> 69.86 million sps -> 1.43s
 ```
+
+this is the data with the same settings but on 1D.
+
+```data
+optimization - million sps - billion sps - time to generate
+-O0 -> 329706.56 msps -> 329.7066 bsps -> 0.000303s
+-O1 -> 505050.51 msps -> 505.0505 bsps -> 0.000198s
+-O2 -> 968992.25 msps -> 968.9922 bsps -> 0.000103s
+-O3 -> 707714.08 msps -> 707.7141 bsps -> 0.000141s
+```
+
+I was also pretty shocked that -O2 beat -O3 but it is what it us.
