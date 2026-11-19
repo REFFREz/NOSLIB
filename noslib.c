@@ -6,8 +6,6 @@
 
 #define PI ((double)3.14159265359)
 
-// local functions needed for noise generation
-
 u64 fallbackValue = 1337;
 u64 randState = 1337;
 
@@ -23,16 +21,28 @@ uint64_t lhash(u64 x) {
     return x;
 }
 
-u64 hash3(u64 a, u64 b, u64 c) {
-    u64 h = lhash(a);
-    h = lhash(h ^ lhash(b));
-    h = lhash(h ^ lhash(c));
-
+static inline u64 hash3(u64 seed, u64 x, u64 y) {
+    u64 h = seed ^ (x * 0x9e3779b185ebca87ULL) ^ (y * 0xc2b2ae3d27d4eb4fULL);
+    
+    h ^= h >> 33;
+    h *= 0xff51afd7ed558ccdULL;
+    h ^= h >> 33;
+    h *= 0xc4ceb9fe1a85ec53ULL;
+    h ^= h >> 33;
+    
     return h;
 }
 
-u64 hash2(u64 a, u64 b) {
-    return (u64)(lhash(lhash(a) ^ (lhash(b))));
+static inline u64 hash2(u64 a, u64 b) {
+    u64 h = 0x9e3779b185ebca87ULL ^ (a * 0xc2b2ae3d27d4eb4fULL) ^ (b * 0x165667b19e3779f9ULL);
+    
+    h ^= h >> 33;
+    h *= 0xff51afd7ed558ccdULL;
+    h ^= h >> 33;
+    h *= 0xc4ceb9fe1a85ec53ULL;
+    h ^= h >> 33;
+    
+    return h;
 }
 
 float frand(u64 seed, float min, float max) {
@@ -48,6 +58,13 @@ float frand(u64 seed, float min, float max) {
     // convert upper 24 bits to [0, 1)
     float t = (float)(x >> 40) / 16777216.0f;
 
+    return min + t * (max - min);
+}
+
+// expects already hashed value does not mix it by itself
+static inline float frand_instant(u64 hash, float min, float max) {
+    float t = (float)(hash >> 40) * 0.000000059604645f; // 1.0f / 16777216.0f
+    
     return min + t * (max - min);
 }
 
@@ -99,57 +116,49 @@ float cosineInterpolation(float t) {
 
 float getNoiseAt(NoiseContext* ctx, float x, float y) {
     if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
-    float csize = (float)ctx->chunkSize;
+    u64 csize = ctx->chunkSize;
 
-    // Find surrounding lattice corners
-    float boundX = floorf(x / csize) * csize;
-    float boundY = floorf(y / csize) * csize;
+    u64 boundX = floorf(x / csize) * csize;
+    u64 boundY = floorf(y / csize) * csize;
 
     u64 bx = (u64)boundX;
     u64 by = (u64)boundY;
 
-    float v1 = frand(hash3(ctx->seed, bx, by), ctx->rangeMin, ctx->rangeMax);
-    float v2 = frand(hash3(ctx->seed, bx + ctx->chunkSize, by), ctx->rangeMin, ctx->rangeMax);
-    float v3 = frand(hash3(ctx->seed, bx, by + ctx->chunkSize), ctx->rangeMin, ctx->rangeMax);
-    float v4 = frand(hash3(ctx->seed, bx + ctx->chunkSize, by + ctx->chunkSize), ctx->rangeMin, ctx->rangeMax);
+    float min = ctx->rangeMin;
+    float max = ctx->rangeMax;
+
+    float v1 = frand_instant(hash3(ctx->seed, bx, by), min, max);
+    float v2 = frand_instant(hash3(ctx->seed, bx + csize, by), min, max);
+    float v3 = frand_instant(hash3(ctx->seed, bx, by + csize), min, max);
+    float v4 = frand_instant(hash3(ctx->seed, bx + csize, by + csize), min, max);
 
     float tx, ty, top, bottom;
 
     switch (ctx->interVersion) {
-        case SMOOTH_STEP: {
+        case SMOOTH_STEP:
             tx = smoothstep((x - boundX) / csize);
             ty = smoothstep((y - boundY) / csize);
-
             break;
-        }
 
-        case LINEAR_INTERPOLATION: {
+        case LINEAR_INTERPOLATION:
             tx = (float)(x - boundX) / (float)csize;
             ty = (float)(y - boundY) / (float)csize;
-
             break;
-        }
 
-        case SMOOTHER_STEP: {
+        case SMOOTHER_STEP:
             tx = smootherstep((x - boundX) / csize);
             ty = smootherstep((y - boundY) / csize);
-
             break;
-        }
 
-        case COSINE_INTERPOLATION: {
+        case COSINE_INTERPOLATION:
             tx = cosineInterpolation((x - boundX) / csize);
             ty = cosineInterpolation((y - boundY) / csize);
-
             break;
-        }
 
-        default: {
+        default:
             tx = smoothstep((x - boundX) / csize);
             ty = smoothstep((y - boundY) / csize);
-
             break;
-        }
     }
 
     top = lerp(v1, v2, tx);
@@ -157,8 +166,6 @@ float getNoiseAt(NoiseContext* ctx, float x, float y) {
 
     return lerp(top, bottom, ty);
 }
-
-// implementation of public functions
 
 float nl_getNoiseAt(NoiseContext* ctx, size_t x, size_t y) {
     if (ctx->chunkSize == 0) ctx->chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
@@ -274,8 +281,8 @@ float getNoiseAt1D(NoiseContext* ctx, float x) {
     float sectionStart = floorf(x / sz) * sz;
     float sectionEnd = sectionStart + sz;
 
-    float v1 = frand(hash2(ctx->seed, sectionStart), ctx->rangeMin, ctx->rangeMax);
-    float v2 = frand(hash2(ctx->seed, sectionEnd), ctx->rangeMin, ctx->rangeMax);
+    float v1 = frand_instant(hash2(ctx->seed, sectionStart), ctx->rangeMin, ctx->rangeMax);
+    float v2 = frand_instant(hash2(ctx->seed, sectionEnd), ctx->rangeMin, ctx->rangeMax);
 
     float t = (x - sectionStart) / sz;
 

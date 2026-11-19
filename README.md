@@ -111,7 +111,7 @@ The inspiration is taken from that video but since PortalRunner was dealing with
 ## Performance note
 
 even tho *NOSLIB* aims for very high speeds at low cost it can still be very slow if used incorrectly.
-it is recommended to use at least -O2 flag to give it a huge performance boost.
+it is recommended to use at least -O1 flag to give it a huge performance boost.
 here is some measurements on Ryzen 9 5900X cpu testing a 10000x10000 world creation with this settings:
 
 ```C
@@ -124,10 +124,10 @@ here is some measurements on Ryzen 9 5900X cpu testing a 10000x10000 world creat
 .seed = 0
 ```
 
-```NO_LANGUAGE
+```data
 optimization - sps(samples per second) - time to generate
--O0 -> 8.04 million sps  -> 12.4s
--O1 -> 22.58 million sps -> 4.4s
--O2 -> 29.65 million sps -> 3.37s
--O3 -> 30.27 million sps -> 3.30s
+-O0 -> 24.47 million sps -> 4.08s
+-O1 -> 62.27 million sps -> 1.60s
+-O2 -> 69.71 million sps -> 1.43s
+-O3 -> 69.86 million sps -> 1.43s
 ```
