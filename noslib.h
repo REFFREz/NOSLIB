@@ -18,6 +18,10 @@ typedef int64_t i64;
     #define NOSLIB_MOVE_RETURN 1
 #endif
 
+#ifndef NOSLIB_USE_FASTER_GEN
+    #define NOSLIB_USE_FASTER_GEN 0
+#endif
+
 #define NOSLIB_DEFAULT_CONTEXT ((NoiseContext) { \
     .seed = 1337, \
     .chunkSize = 10, \

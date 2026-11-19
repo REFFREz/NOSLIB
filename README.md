@@ -61,6 +61,17 @@ COSINE_INTERPOLATION,
 LINEAR_INTERPOLATION
 ```
 
+Also *NOSLIB* does not force user to use some settings over others. there are many settings to
+change before including the library in your project. here are few:
+
+```C
+// all these are the values already predefined by the library, to make actual changes to the
+// library maybe consider some other values
+#define NOSLIB_DEFAULT_CHUNK_SIZE 50
+#define NOSLIB_MOVE_RETURN 1
+#define NOSLIB_USE_FASTER_GEN 0
+```
+
 ## 1D noise
 
 *NOSLIB* offers a way to generate 1D noise directly without needing to use normal 2D functions.

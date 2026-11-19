@@ -126,11 +126,20 @@ float getNoiseAt(NoiseContext* ctx, float x, float y) {
 
     float min = ctx->rangeMin;
     float max = ctx->rangeMax;
-
-    float v1 = frand_instant(hash3(ctx->seed, bx, by), min, max);
-    float v2 = frand_instant(hash3(ctx->seed, bx + csize, by), min, max);
-    float v3 = frand_instant(hash3(ctx->seed, bx, by + csize), min, max);
-    float v4 = frand_instant(hash3(ctx->seed, bx + csize, by + csize), min, max);
+    
+    #if NOSLIB_USE_FASTER_GEN != 0
+        // this version is a little faster but it may come at a cost of worst randomness
+        // none of the statistics measured in the README use this version
+        float v1 = frand_instant(ctx->seed ^ hash2(bx, by), min, max);
+        float v2 = frand_instant(ctx->seed ^ hash2(bx + csize, by), min, max);
+        float v3 = frand_instant(ctx->seed ^ hash2(bx, by + csize), min, max);
+        float v4 = frand_instant(ctx->seed ^ hash2(bx + csize, by + csize), min, max);        
+    #else
+        float v1 = frand_instant(hash3(ctx->seed, bx, by), min, max);
+        float v2 = frand_instant(hash3(ctx->seed, bx + csize, by), min, max);
+        float v3 = frand_instant(hash3(ctx->seed, bx, by + csize), min, max);
+        float v4 = frand_instant(hash3(ctx->seed, bx + csize, by + csize), min, max);
+    #endif
 
     float tx, ty, top, bottom;
 
