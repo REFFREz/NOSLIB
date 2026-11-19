@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <stdio.h>
 
 typedef uint64_t u64;
 typedef int64_t i64;
@@ -10,17 +11,11 @@ typedef int64_t i64;
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-#ifndef NOSLIB_DEFAULT_CHUNK_SIZE
-    #define NOSLIB_DEFAULT_CHUNK_SIZE 50
-#endif
-
-#ifndef NOSLIB_MOVE_RETURN
-    #define NOSLIB_MOVE_RETURN 1
-#endif
-
-#ifndef NOSLIB_USE_FASTER_GEN
-    #define NOSLIB_USE_FASTER_GEN 0
-#endif
+// due to some issues with the compiler and C pre-processor i had to remove #ifndef guards
+// modify settings before compiling to take effect on the generation process
+#define NOSLIB_DEFAULT_CHUNK_SIZE 50
+#define NOSLIB_MOVE_RETURN 1
+#define NOSLIB_USE_FASTER_GEN 0
 
 #define NOSLIB_DEFAULT_CONTEXT ((NoiseContext) { \
     .seed = 1337, \
