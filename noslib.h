@@ -5,17 +5,20 @@
 #include <stddef.h>
 #include <stdio.h>
 
+typedef uint8_t u8;
 typedef uint64_t u64;
 typedef int64_t i64;
 
 #define MAX(a, b) ((a) > (b) ? (a) : (b))
 #define MIN(a, b) ((a) < (b) ? (a) : (b))
 
-// due to some issues with the compiler and C pre-processor i had to remove #ifndef guards
-// modify settings before compiling to take effect on the generation process
-#define NOSLIB_DEFAULT_CHUNK_SIZE 50
-#define NOSLIB_MOVE_RETURN 1
-#define NOSLIB_USE_FASTER_GEN 0
+#ifndef NOSLIB_DEFAULT_CHUNK_SIZE
+    #define NOSLIB_DEFAULT_CHUNK_SIZE 50
+#endif
+
+#ifndef NOSLIB_MOVE_RETURN
+    #define NOSLIB_MOVE_RETURN 1
+#endif
 
 #define NOSLIB_DEFAULT_CONTEXT ((NoiseContext) { \
     .seed = 1337, \
@@ -23,7 +26,11 @@ typedef int64_t i64;
     .octaves = 1, \
     .freq = 1.0f, \
     .rangeMax = 100.0f, \
-    .rangeMin = 0.0f \
+    .rangeMin = 0.0f, \
+    .settings = (NoiseContextExtraSettings) { \
+        .use2hash = 0, \
+        .useAdvancedFrand = 0, \
+    } \
 })
 
 typedef enum {
@@ -32,6 +39,12 @@ typedef enum {
     COSINE_INTERPOLATION,
     LINEAR_INTERPOLATION
 } NoiseInterpolationVersions;
+
+typedef struct {
+    // this option speeds up generation by a little bit but it might hurt the randomness
+    u8 use2hash; // 0 recommended
+    u8 useAdvancedFrand; // 0 recommended
+} NoiseContextExtraSettings;
 
 typedef struct {
     u64 seed;
@@ -43,6 +56,8 @@ typedef struct {
     float rangeMax;
 
     NoiseInterpolationVersions interVersion; // defaulted to SMOOTH_STEP
+
+    NoiseContextExtraSettings settings; 
 } NoiseContext;
 
 float nl_getNoiseAt(NoiseContext* ctx, size_t x, size_t y);

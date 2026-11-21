@@ -23,7 +23,9 @@ int main(int argc, char** argv) {
         .interVersion = SMOOTH_STEP,
         .rangeMax = 5.0f,
         .rangeMin = 0.0f,
-        .seed = time(NULL)
+        .seed = time(NULL),
+
+        .settings = {0}
     };
 
     float* chunkData = nl_getChunkAt(&ctx, 0, 0);

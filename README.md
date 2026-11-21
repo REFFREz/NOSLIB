@@ -17,12 +17,17 @@ NoiseContext ctx = {
     .octaves = 1,
     .freq = 1.0f,
     .rangeMax = 100.0f,
-    .rangeMin = 0.0f
+    .rangeMin = 0.0f,
+    // or just do .settings = {0};
+    .settings = (NoiseContextExtraSettings) {
+        .use2hash = 0,
+        .useAdvancedFrand = 0,
+    }
 };
 ```
 
 this code states what the noise being produced should look like.
-also you don't have to write it out all the time it's already defined in the header.
+also you don't have to write it out all the time, it's already defined in the header.
 just use this.
 
 ```C
@@ -62,14 +67,14 @@ LINEAR_INTERPOLATION
 ```
 
 Also *NOSLIB* does not force user to use some settings over others. there are many settings to
-change before including the library in your project. here are few:
+change inside the context. to change them you just gotta access the settings struct.
 
 ```C
 // all these are the values already predefined by the library, to make actual changes to the
 // library maybe consider some other values
-#define NOSLIB_DEFAULT_CHUNK_SIZE 50
-#define NOSLIB_MOVE_RETURN 1
-#define NOSLIB_USE_FASTER_GEN 0
+NoiseContext ctx = NOSLIB_DEFAULT_CONTEXT;
+ctx.settings.use2hash = 0;
+ctx.settings.useAdvancedFrand = 0;
 ```
 
 ## 1D noise
@@ -126,31 +131,32 @@ it is recommended to use at least -O1 flag to give it a huge performance boost.
 here is some measurements on Ryzen 9 5900X cpu testing a 10000x10000 world creation with this settings:
 
 ```C
-.chunkSize = 100
-.freq = 1
-.interVersion = SMOOTH_STEP
-.octaves = 0
-.rangeMax = 100
-.rangeMin = 0
-.seed = 0
+.chunkSize = 100,
+.freq = 1,
+.interVersion = SMOOTH_STEP,
+.octaves = 0,
+.rangeMax = 100,
+.rangeMin = 0,
+.seed = 0,
+.settings = {0}
 ```
 
 ```data
 optimization - sps(samples per second) - time to generate
--O0 -> 24.47 million sps -> 4.08s
--O1 -> 62.27 million sps -> 1.60s
--O2 -> 69.71 million sps -> 1.43s
--O3 -> 69.86 million sps -> 1.43s
+-O0 -> 19.12 million sps -> 5.231s
+-O1 -> 63.41 million sps -> 1.576s
+-O2 -> 67.92 million sps -> 1.472s
+-O3 -> 67.81 million sps -> 1.474s
 ```
 
 this is the data with the same settings but on 1D.
 
 ```data
 optimization - million sps - billion sps - time to generate
--O0 -> 329706.56 msps -> 329.7066 bsps -> 0.000303s
--O1 -> 505050.51 msps -> 505.0505 bsps -> 0.000198s
--O2 -> 968992.25 msps -> 968.9922 bsps -> 0.000103s
--O3 -> 707714.08 msps -> 707.7141 bsps -> 0.000141s
+-O0 -> 326690.62 msps -> 326.6906 bsps -> 0.000306s
+-O1 -> 740192.45 msps -> 740.1925 bsps -> 0.000135s
+-O2 -> 917431.19 msps -> 917.4312 bsps -> 0.000109s
+-O3 -> 896057.35 msps -> 896.0573 bsps -> 0.000112s
 ```
 
 I was also pretty shocked that -O2 beat -O3 but it is what it us.

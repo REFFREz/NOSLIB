@@ -127,21 +127,37 @@ float getNoiseAt(NoiseContext* ctx, float x, float y) {
     float min = ctx->rangeMin;
     float max = ctx->rangeMax;
     
-    #if NOSLIB_USE_FASTER_GEN != 0
+    float v1, v2, v3, v4;
+    float tx, ty, top, bottom;
+    
+    // using settings instead of pre-processor macros drops the performance by about 2%
+    if (ctx->settings.use2hash != 0) {
         // this version is a little faster but it may come at a cost of worst randomness
         // none of the statistics measured in the README use this version
-        float v1 = frand_instant(ctx->seed ^ hash2(bx, by), min, max);
-        float v2 = frand_instant(ctx->seed ^ hash2(bx + csize, by), min, max);
-        float v3 = frand_instant(ctx->seed ^ hash2(bx, by + csize), min, max);
-        float v4 = frand_instant(ctx->seed ^ hash2(bx + csize, by + csize), min, max);        
-    #else
-        float v1 = frand_instant(hash3(ctx->seed, bx, by), min, max);
-        float v2 = frand_instant(hash3(ctx->seed, bx + csize, by), min, max);
-        float v3 = frand_instant(hash3(ctx->seed, bx, by + csize), min, max);
-        float v4 = frand_instant(hash3(ctx->seed, bx + csize, by + csize), min, max);
-    #endif
-
-    float tx, ty, top, bottom;
+        if (ctx->settings.useAdvancedFrand) {
+            v1 = frand(ctx->seed ^ hash2(bx, by), min, max);
+            v2 = frand(ctx->seed ^ hash2(bx + csize, by), min, max);
+            v3 = frand(ctx->seed ^ hash2(bx, by + csize), min, max);
+            v4 = frand(ctx->seed ^ hash2(bx + csize, by + csize), min, max);
+        } else {
+            v1 = frand_instant(ctx->seed ^ hash2(bx, by), min, max);
+            v2 = frand_instant(ctx->seed ^ hash2(bx + csize, by), min, max);
+            v3 = frand_instant(ctx->seed ^ hash2(bx, by + csize), min, max);
+            v4 = frand_instant(ctx->seed ^ hash2(bx + csize, by + csize), min, max);
+        }
+    } else {
+        if (ctx->settings.useAdvancedFrand) {
+            v1 = frand(hash3(ctx->seed, bx, by), min, max);
+            v2 = frand(hash3(ctx->seed, bx + csize, by), min, max);
+            v3 = frand(hash3(ctx->seed, bx, by + csize), min, max);
+            v4 = frand(hash3(ctx->seed, bx + csize, by + csize), min, max);
+        } else {
+            v1 = frand_instant(hash3(ctx->seed, bx, by), min, max);
+            v2 = frand_instant(hash3(ctx->seed, bx + csize, by), min, max);
+            v3 = frand_instant(hash3(ctx->seed, bx, by + csize), min, max);
+            v4 = frand_instant(hash3(ctx->seed, bx + csize, by + csize), min, max);
+        }
+    }
 
     switch (ctx->interVersion) {
         case SMOOTH_STEP:
@@ -290,9 +306,16 @@ float getNoiseAt1D(NoiseContext* ctx, float x) {
     float sectionStart = floorf(x / sz) * sz;
     float sectionEnd = sectionStart + sz;
 
-    float v1 = frand_instant(hash2(ctx->seed, sectionStart), ctx->rangeMin, ctx->rangeMax);
-    float v2 = frand_instant(hash2(ctx->seed, sectionEnd), ctx->rangeMin, ctx->rangeMax);
+    float v1, v2;
 
+    if (ctx->settings.useAdvancedFrand != 0) {
+        v1 = frand(hash2(ctx->seed, sectionStart), ctx->rangeMin, ctx->rangeMax);
+        v2 = frand(hash2(ctx->seed, sectionEnd), ctx->rangeMin, ctx->rangeMax);
+    } else {
+        v1 = frand_instant(hash2(ctx->seed, sectionStart), ctx->rangeMin, ctx->rangeMax);
+        v2 = frand_instant(hash2(ctx->seed, sectionEnd), ctx->rangeMin, ctx->rangeMax);
+    }
+    
     float t = (x - sectionStart) / sz;
 
     switch (ctx->interVersion) {
