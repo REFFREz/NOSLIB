@@ -122,7 +122,7 @@ The main inspiration comes from this youtube video by PortalRunner:
 [Watch the video](https://www.youtube.com/watch?v=p-k5MPhBSjk)
 skip to about 5:00.
 
-The inspiration is taken from that video but since PortalRunner was dealing with much more limited hardware so i added different interpolation functions, more advanced random function and such.
+The inspiration is taken from that video but since PortalRunner was dealing with much more limited hardware, i added different interpolation functions, more advanced random function and such.
 
 ## Performance note
 
