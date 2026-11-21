@@ -494,3 +494,49 @@ float nl_move(float value, float goal) {
 
     return 0;
 }
+
+NoiseContext* nl_initContext() {
+    NoiseContext* out = malloc(sizeof(NoiseContext));
+    if (out == NULL) return NULL;
+
+    *out = NOSLIB_DEFAULT_CONTEXT;
+
+    return out;
+}
+
+void nl_contextSetSeed(NoiseContext* ctx, u64 seed) {
+    if (ctx == NULL) return;
+    ctx->seed = seed;
+}
+
+void nl_contextSetChunkSize(NoiseContext* ctx, size_t chunkSize) {
+    if (ctx == NULL) return;
+    if (chunkSize == 0) chunkSize = NOSLIB_DEFAULT_CHUNK_SIZE;
+
+    ctx->chunkSize = chunkSize;
+}
+
+void nl_contextSetOctaves(NoiseContext* ctx, size_t octaves) {
+    if (ctx == NULL) return;
+
+    ctx->octaves = octaves;
+}
+
+void nl_contextSetFrequency(NoiseContext* ctx, float freq) {
+    if (ctx == NULL) return;
+
+    if (freq == 0) freq = 1.0f;
+
+    ctx->freq = freq;
+}
+
+void nl_contextSetRange(NoiseContext* ctx, float min, float max) {
+    if (ctx == NULL) return;
+    ctx->rangeMin = MIN(min, max);
+    ctx->rangeMax = MAX(min, max);
+}
+
+void nl_contextSetInterpolation(NoiseContext* ctx, NoiseInterpolationVersions interVersion) {
+    if (ctx == NULL) return;
+    ctx->interVersion = interVersion;
+}

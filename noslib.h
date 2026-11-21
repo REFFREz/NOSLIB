@@ -60,6 +60,14 @@ typedef struct {
     NoiseContextExtraSettings settings; 
 } NoiseContext;
 
+NoiseContext* nl_initContext();
+void nl_contextSetSeed(NoiseContext* ctx, u64 seed);
+void nl_contextSetChunkSize(NoiseContext* ctx, size_t chunkSize);
+void nl_contextSetOctaves(NoiseContext* ctx, size_t octaves);
+void nl_contextSetFrequency(NoiseContext* ctx, float freq);
+void nl_contextSetRange(NoiseContext* ctx, float min, float max);
+void nl_contextSetInterpolation(NoiseContext* ctx, NoiseInterpolationVersions interVersion);
+
 float nl_getNoiseAt(NoiseContext* ctx, size_t x, size_t y);
 
 // chunkX and Y should be the topleft corners of a chunk
