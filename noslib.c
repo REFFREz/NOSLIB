@@ -2,6 +2,7 @@
 
 #include <stdlib.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <math.h>
 
 #define PI ((double)3.14159265359)
@@ -539,4 +540,53 @@ void nl_contextSetRange(NoiseContext* ctx, float min, float max) {
 void nl_contextSetInterpolation(NoiseContext* ctx, NoiseInterpolationVersions interVersion) {
     if (ctx == NULL) return;
     ctx->interVersion = interVersion;
+}
+
+float nl_min(float* data, size_t len) {
+    if (data == NULL || len == 0) return -1;
+    
+    float min = data[0];
+
+    for (size_t i = 0; i < len; i++) {
+        if (data[i] < min) min = data[i];
+    }
+
+    return min;
+}
+
+float nl_max(float* data, size_t len) {
+    if (data == NULL || len == 0) return -1;
+
+    float max = data[0];
+
+    for (size_t i = 0; i < len; i++) {
+        if (data[i] > max) max = data[i];
+    }
+
+    return max;
+}
+
+float nl_avg(float* data, size_t len) {
+    if (data == NULL || len == 0) return -1;
+
+    float avg = 0;
+
+    for (size_t i = 0; i < len; i++) {
+        avg += data[i];
+    }
+
+    return avg / len;
+}
+
+float* nl_blend(float* noise1, float* noise2, size_t len) {
+    if (noise1 == NULL || noise2 == NULL || len == 0) return NULL;
+
+    float* out = malloc(sizeof(float) * len);
+    if (out == NULL) return NULL;
+
+    for (size_t i = 0; i < len; i++) {
+        out[i] = (noise1[i] + noise2[i]) / 2;
+    }
+
+    return out;
 }

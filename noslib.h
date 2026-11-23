@@ -76,7 +76,6 @@ void nl_getChunkInto(NoiseContext* ctx, size_t chunkX, size_t chunkY, float* des
 float* nl_getBatch(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2);
 void nl_getBatchInto(NoiseContext* ctx, size_t x1, size_t y1, size_t x2, size_t y2, float* dest);
 
-
 // ************ //
 // 1D functions //
 // ************ //
@@ -99,6 +98,12 @@ void  nl_scaleArr(float* data, size_t len, float scale);
 float nl_remap(float value, float in_min, float in_max, float out_min, float out_max);
 void  nl_remapArr(float* data, size_t len, float in_min, float in_max, float out_min, float out_max);
 float nl_fract(float value);
+
+float nl_min(float* data, size_t len);
+float nl_max(float* data, size_t len);
+float nl_avg(float* data, size_t len);
+
+float* nl_blend(float* noise1, float* noise2, size_t len);
 
 // returns a value either 2 if value is less than goal, returns -2 if value is bigger than goal
 // and returns 1 if they are equal. also return 1 can be changed to any value with defenition of
